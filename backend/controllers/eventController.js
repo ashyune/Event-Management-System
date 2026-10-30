@@ -104,7 +104,7 @@ const updateEvent = async (req, res) => {
         }
 
         if (
-            req.user.role !== 'admin' &&
+            req.user.role !== 'administrator' &&
             Number(event.organizerId) !== Number(req.user.id)
         ) {
             return res.status(403).json({
@@ -255,5 +255,63 @@ const updateEvent = async (req, res) => {
         });
     }
 };
+const updateEventStatus = async (req, res, newStatus) => {
+    try {
+        const event = await Event.findByPk(req.params.eventId);
 
-module.exports = { createEvent, updateEvent };
+        if (!event) {
+            return res.status(404).json({
+                message: 'Event not found'
+            });
+        }
+
+        if (
+            req.user.role !== 'administrator' &&
+            Number(event.organizerId) !== Number(req.user.id)
+        ) {
+            return res.status(403).json({
+                message: 'You are not authorized to change this event status'
+            });
+        }
+
+        if (event.status === 'cancelled') {
+            return res.status(400).json({
+                message: 'A cancelled event cannot change status'
+            });
+        }
+
+        if (newStatus === 'published' && event.status !== 'draft') {
+            return res.status(400).json({
+                message: 'Only draft events can be published'
+            });
+        }
+
+        event.status = newStatus;
+        await event.save();
+
+        return res.status(200).json({
+            message: `Event ${newStatus} successfully`,
+            event
+        });
+    } catch (error) {
+        console.error('Update event status error:', error);
+
+        return res.status(500).json({
+            message: 'Unable to update event status'
+        });
+    }
+};
+
+const publishEvent = async (req, res) => {
+    return updateEventStatus(req, res, 'published');
+};
+
+const cancelEvent = async (req, res) => {
+    return updateEventStatus(req, res, 'cancelled');
+};
+module.exports = {
+    createEvent,
+    updateEvent,
+    publishEvent,
+    cancelEvent
+};
