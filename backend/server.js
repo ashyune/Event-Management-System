@@ -8,8 +8,10 @@ require("./models/Event");
 require("./models/Registration");
 
 const eventRoutes = require("./routes/eventRoutes");
+const organizerRoutes = require("./routes/organizerRoutes");
 const authRoutes = require("./routes/authRoutes");
 const registrationRoutes = require("./routes/registrationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const authenticate = require("./middleware/authMiddleware");
 const authorizeRoles = require("./middleware/roleMiddleware");
 
@@ -25,8 +27,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/events", organizerRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/api/auth/me", authenticate, (req, res) => {
   res.json({
