@@ -4,7 +4,9 @@ require("dotenv").config();
 
 const sequelize = require("./config/database");
 require("./models/User");
+require("./models/Event");
 
+const eventRoutes = require("./routes/eventRoutes");
 const authRoutes = require("./routes/authRoutes");
 const authenticate = require("./middleware/authMiddleware");
 const authorizeRoles = require("./middleware/roleMiddleware");
@@ -21,6 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/events", eventRoutes);
 
 app.get("/api/auth/me", authenticate, (req, res) => {
   res.json({
