@@ -1,5 +1,5 @@
 const Event = require('../models/Event');
-
+const User = require('../models/User');
 const createEvent = async (req, res) => {
     try {
         const { title, description, date, time, venue, capacity } = req.body;
@@ -309,9 +309,46 @@ const publishEvent = async (req, res) => {
 const cancelEvent = async (req, res) => {
     return updateEventStatus(req, res, 'cancelled');
 };
+const getPublishedEvents = async (req, res) => {
+    try {
+        const events = await Event.findAll({
+            where: {
+                status: 'published'
+            },
+            attributes: [
+                'id',
+                'title',
+                'description',
+                'date',
+                'time',
+                'venue',
+                'capacity',
+                'status',
+                'organizerId',
+                'createdAt'
+            ],
+            order: [
+                ['date', 'ASC'],
+                ['time', 'ASC']
+            ]
+        });
+
+        return res.status(200).json({
+            count: events.length,
+            events
+        });
+    } catch (error) {
+        console.error('Get published events error:', error);
+
+        return res.status(500).json({
+            message: 'Unable to retrieve published events'
+        });
+    }
+};
 module.exports = {
     createEvent,
     updateEvent,
     publishEvent,
-    cancelEvent
+    cancelEvent,
+    getPublishedEvents
 };
