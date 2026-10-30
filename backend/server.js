@@ -7,6 +7,7 @@ require("./models/User");
 
 const authRoutes = require("./routes/authRoutes");
 const authenticate = require("./middleware/authMiddleware");
+const authorizeRoles = require("./middleware/roleMiddleware");
 
 const app = express();
 
@@ -27,6 +28,18 @@ app.get("/api/auth/me", authenticate, (req, res) => {
     user: req.user,
   });
 });
+
+app.get(
+  "/api/admin/test",
+  authenticate,
+  authorizeRoles("administrator"),
+  (req, res) => {
+    res.json({
+      message: "Administrator access granted",
+      user: req.user,
+    });
+  }
+);
 
 const PORT = process.env.PORT || 5000;
 
