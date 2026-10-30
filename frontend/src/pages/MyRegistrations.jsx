@@ -33,7 +33,7 @@ function MyRegistrations() {
       navigate("/login");
       return;
     }
-    // Use void to signal fire-and-forget async to ESLint
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetch is intentional
     void loadRegistrations();
   }, [navigate, loadRegistrations]);
 

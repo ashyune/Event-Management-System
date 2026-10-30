@@ -43,6 +43,7 @@ function Events() {
   }, [isLoggedIn]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetch is intentional
     void loadData();
   }, [loadData]);
 
