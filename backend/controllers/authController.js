@@ -35,7 +35,7 @@ const register = async (req, res) => {
     const user = await User.create({
       name: name.trim(),
       email: normalizedEmail,
-      password: hashedPassword,
+      passwordHash: hashedPassword,
       role: "participant",
     });
 
@@ -50,6 +50,12 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
+
+    if (error.name === "SequelizeValidationError") {
+      return res.status(400).json({
+        message: "Invalid email format",
+      });
+    }
 
     return res.status(500).json({
       message: "Unable to register user",
@@ -73,7 +79,7 @@ const login = async (req, res) => {
       },
     });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
       return res.status(401).json({
         message: "Invalid email or password",
       });

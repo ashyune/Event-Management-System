@@ -3,6 +3,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const sequelize = require("./config/database");
+require("./models/User");
+
 const authRoutes = require("./routes/authRoutes");
 const authenticate = require("./middleware/authMiddleware");
 
