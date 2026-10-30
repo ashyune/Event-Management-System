@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getPublishedEvents } from "../services/eventservice";
 import { registerForEvent, getMyRegistrations } from "../services/registrationservice";
@@ -14,37 +14,37 @@ function Events() {
 
   const isLoggedIn = !!localStorage.getItem("token");
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const data = await getPublishedEvents();
-        setEvents(Array.isArray(data.events) ? data.events : []);
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getPublishedEvents();
+      setEvents(Array.isArray(data.events) ? data.events : []);
 
-        if (isLoggedIn) {
-          try {
-            const regData = await getMyRegistrations();
-            if (Array.isArray(regData.registrations)) {
-              const activeIds = new Set(
-                regData.registrations
-                  .filter((r) => r.status === "confirmed")
-                  .map((r) => r.eventId)
-              );
-              setRegisteredEventIds(activeIds);
-            }
-          } catch {
-            // Non-blocking if registrations fail to load
+      if (isLoggedIn) {
+        try {
+          const regData = await getMyRegistrations();
+          if (Array.isArray(regData.registrations)) {
+            const activeIds = new Set(
+              regData.registrations
+                .filter((r) => r.status === "confirmed")
+                .map((r) => r.eventId)
+            );
+            setRegisteredEventIds(activeIds);
           }
+        } catch {
+          // Non-blocking if registrations fail to load
         }
-      } catch (error) {
-        setMessage(error.response?.data?.message || "Unable to load events.");
-      } finally {
-        setLoading(false);
       }
-    };
-
-    loadData();
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Unable to load events.");
+    } finally {
+      setLoading(false);
+    }
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

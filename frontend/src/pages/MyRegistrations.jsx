@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMyRegistrations, cancelRegistration } from "../services/registrationservice";
 
@@ -11,7 +11,7 @@ function MyRegistrations() {
   const [actionSuccess, setActionSuccess] = useState("");
   const navigate = useNavigate();
 
-  const loadRegistrations = async () => {
+  const loadRegistrations = useCallback(async () => {
     try {
       setLoading(true);
       setMessage("");
@@ -26,15 +26,16 @@ function MyRegistrations() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       navigate("/login");
       return;
     }
-    loadRegistrations();
-  }, [navigate]);
+    // Use void to signal fire-and-forget async to ESLint
+    void loadRegistrations();
+  }, [navigate, loadRegistrations]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -222,4 +223,3 @@ function MyRegistrations() {
 }
 
 export default MyRegistrations;
-
