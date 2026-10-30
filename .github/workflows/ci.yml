@@ -2,9 +2,11 @@ name: Event Management System CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - "**"
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   backend-check:
