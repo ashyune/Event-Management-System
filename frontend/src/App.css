@@ -42,15 +42,17 @@ button {
 .auth-card {
   width: 100%;
   max-width: 430px;
-  background: white;
+  background: #ffffff;
   padding: 36px;
   border-radius: 18px;
   box-shadow: 0 12px 40px rgba(30, 41, 59, 0.1);
+  text-align: left;
 }
 
 .auth-card h1 {
   margin: 0 0 10px;
-  font-size: 30px;
+  font-size: 28px;
+  color: #0f172a;
 }
 
 .auth-card > p {
@@ -62,6 +64,7 @@ button {
   display: block;
   margin: 18px 0 8px;
   font-weight: 600;
+  color: #334155;
 }
 
 .auth-card input {
@@ -70,6 +73,8 @@ button {
   border: 1px solid #dbe1ec;
   border-radius: 9px;
   outline: none;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 .auth-card input:focus {
@@ -77,7 +82,7 @@ button {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
-.auth-card button {
+.auth-card button:not(.auth-toggle-password) {
   width: 100%;
   padding: 13px;
   margin-top: 24px;
@@ -88,11 +93,11 @@ button {
   font-weight: 600;
 }
 
-.auth-card button:hover {
+.auth-card button:not(.auth-toggle-password):hover {
   background: #3730a3;
 }
 
-.auth-card button:disabled {
+.auth-card button:not(.auth-toggle-password):disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -1244,23 +1249,30 @@ button {
   box-sizing: border-box;
 }
 
-.auth-toggle-password {
+.auth-toggle-password,
+.auth-card button.auth-toggle-password {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #6366f1;
-  font-weight: 600;
-  font-size: 13px;
+  width: auto !important;
+  margin-top: 0 !important;
+  padding: 4px 8px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #6366f1 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
   cursor: pointer;
-  padding: 4px 8px;
   line-height: 1;
+  box-shadow: none !important;
+  z-index: 2;
 }
 
-.auth-toggle-password:hover {
-  color: #4f46e5;
+.auth-toggle-password:hover,
+.auth-card button.auth-toggle-password:hover {
+  background: transparent !important;
+  color: #3730a3 !important;
 }
 
 .auth-hint {

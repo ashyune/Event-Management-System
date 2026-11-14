@@ -37,3 +37,4 @@
 - **Tablet Viewport (768px - 1023px):** Verified 2-column event grid, side-by-side forms, balanced padding.
 - **Desktop Viewport (1024px+):** Verified 3-column event grid, top navigation bar.
 - **Accessibility & Keyboard Nav:** All interactive elements (`<button>`, `<Link>`, `<input>`) have visible focus rings (`:focus-visible`), explicit `aria-label` / `aria-expanded` attributes, and semantic landmarks (`<main>`, `<header>`, `<nav>`, `<article>`).
+
