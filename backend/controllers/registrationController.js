@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const Registration = require('../models/Registration');
 const Event = require('../models/Event');
 const User = require('../models/User');
+const AuditLog = require('../models/AuditLog');
 
 /**
  * Generate a unique, verifiable ticket code
@@ -11,6 +12,25 @@ const generateTicketCode = (eventId, userId) => {
     const randomHex = crypto.randomBytes(3).toString('hex').toUpperCase();
     const timestamp = Date.now().toString(36).toUpperCase();
     return `TKT-E${eventId}-U${userId}-${timestamp}-${randomHex}`;
+};
+
+/**
+ * Write a structured audit log entry — Issue #30
+ * Failure is non-fatal: we log the error but never block the main response.
+ */
+const writeAuditLog = async ({ userId, action, entityId, metadata = {} }) => {
+    try {
+        await AuditLog.create({
+            userId,
+            action,
+            entityId,
+            entityType: 'registration',
+            metadata
+        });
+    } catch (auditErr) {
+        // Audit failure must never crash the main request
+        console.error('[AuditLog] Failed to write audit entry:', auditErr.message);
+    }
 };
 
 /**
@@ -123,6 +143,18 @@ const registerForEvent = async (req, res) => {
             });
         }
 
+        // 7. Audit log — Issue #30
+        await writeAuditLog({
+            userId: req.user.id,
+            action: 'REGISTRATION_CREATED',
+            entityId: registration.id,
+            metadata: {
+                eventId: parsedEventId,
+                eventTitle: event.title,
+                ticketCode
+            }
+        });
+
         // Fetch populated event details
         const populatedRegistration = await Registration.findByPk(registration.id, {
             include: [
@@ -232,6 +264,18 @@ const cancelRegistration = async (req, res) => {
         registration.status = 'cancelled';
         await registration.save();
 
+        // Audit log — Issue #30
+        await writeAuditLog({
+            userId: req.user.id,
+            action: 'REGISTRATION_CANCELLED',
+            entityId: registration.id,
+            metadata: {
+                eventId: registration.eventId,
+                eventTitle: registration.event ? registration.event.title : null,
+                ticketCode: registration.ticketCode
+            }
+        });
+
         return res.status(200).json({
             message: 'Registration cancelled successfully. Seat has been released.',
             registration
@@ -302,4 +346,3 @@ module.exports = {
     cancelRegistration,
     getEventRegistrationStatus
 };
-

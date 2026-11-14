@@ -9,6 +9,7 @@ function MyRegistrations() {
   const [filter, setFilter] = useState("all"); // 'all', 'confirmed', 'cancelled'
   const [cancellingId, setCancellingId] = useState(null);
   const [actionSuccess, setActionSuccess] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const loadRegistrations = useCallback(async () => {
@@ -76,7 +77,19 @@ function MyRegistrations() {
           EventHub
         </Link>
 
-        <nav className="events-nav">
+        <button
+          type="button"
+          className="hamburger-btn"
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav className={`events-nav ${menuOpen ? "events-nav--open" : ""}`}>
           <Link to="/events">Browse Events</Link>
           <Link to="/events/create">Create Event</Link>
           <Link to="/my-registrations" className="nav-active">
