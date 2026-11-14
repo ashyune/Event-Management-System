@@ -6,6 +6,7 @@ const sequelize = require("./config/database");
 require("./models/User");
 require("./models/Event");
 require("./models/Registration");
+require("./models/AuditLog");
 
 const eventRoutes = require("./routes/eventRoutes");
 const organizerRoutes = require("./routes/organizerRoutes");

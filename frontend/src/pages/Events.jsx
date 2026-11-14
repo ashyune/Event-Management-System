@@ -10,6 +10,7 @@ function Events() {
   const [registeringId, setRegisteringId] = useState(null);
   const [registeredEventIds, setRegisteredEventIds] = useState(new Set());
   const [successModalData, setSuccessModalData] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const isLoggedIn = !!localStorage.getItem("token");
@@ -91,7 +92,19 @@ function Events() {
           EventHub
         </Link>
 
-        <nav className="events-nav">
+        <button
+          type="button"
+          className="hamburger-btn"
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav className={`events-nav ${menuOpen ? "events-nav--open" : ""}`}>
           <Link to="/events" className="nav-active">Browse Events</Link>
           <Link to="/events/create">Create Event</Link>
           {isLoggedIn ? (
@@ -131,7 +144,7 @@ function Events() {
       <section className="events-content">
         <div className="events-section-heading">
           <div>
-            <p className="events-eyebrow">WHAT'S HAPPENING</p>
+            <p className="events-eyebrow">WHAT&apos;S HAPPENING</p>
             <h2>Upcoming Events</h2>
           </div>
           <span>{events.length} {events.length === 1 ? "event" : "events"}</span>
