@@ -1,6 +1,7 @@
-
+const { Op } = require('sequelize');
 const Event = require('../models/Event');
 const AuditLog = require('../models/AuditLog');
+const Registration = require('../models/Registration');
 
 const writeAuditLog = async (userId, action, event, metadata = {}) => {
     try {
@@ -16,7 +17,6 @@ const writeAuditLog = async (userId, action, event, metadata = {}) => {
         throw error;
     }
 };
-
 const createEvent = async (req, res, next) => {
     try {
         const { title, description, date, time, venue, capacity } = req.body;
@@ -334,10 +334,38 @@ const cancelEvent = async (req, res, next) => {
 
 const getPublishedEvents = async (req, res, next) => {
     try {
+        const { keyword, date, status } = req.query;
+
+        const where = {
+            status: 'published'
+        };
+
+        if (keyword && keyword.trim()) {
+            where[Op.or] = [
+                { title: { [Op.iLike]: `%${keyword.trim()}%` } },
+                { description: { [Op.iLike]: `%${keyword.trim()}%` } },
+                { venue: { [Op.iLike]: `%${keyword.trim()}%` } }
+            ];
+        }
+
+        if (date) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(400).json({
+                    message: 'Date must use YYYY-MM-DD format'
+                });
+            }
+
+            where.date = date;
+        }
+
+        if (status && status !== 'published') {
+            return res.status(400).json({
+                message: 'Only published events are available in public event search'
+            });
+        }
+
         const events = await Event.findAll({
-            where: {
-                status: 'published'
-            },
+            where,
             attributes: [
                 'id',
                 'title',
@@ -365,10 +393,53 @@ const getPublishedEvents = async (req, res, next) => {
     }
 };
 
+const getEventById = async (req, res, next) => {
+    try {
+        const eventId = Number(req.params.id);
+
+        if (!Number.isSafeInteger(eventId) || eventId < 1) {
+            return res.status(400).json({
+                message: 'Invalid event ID'
+            });
+        }
+
+        const event = await Event.findByPk(eventId);
+
+        if (!event || event.status !== 'published') {
+            return res.status(404).json({
+                message: 'Published event not found'
+            });
+        }
+
+        const confirmedCount = await Registration.count({
+            where: {
+                eventId: event.id,
+                status: 'confirmed'
+            }
+        });
+
+        const seatsAvailable = Math.max(
+            0,
+            event.capacity - confirmedCount
+        );
+
+        return res.status(200).json({
+            event: {
+                ...event.toJSON(),
+                confirmedRegistrations: confirmedCount,
+                seatsAvailable
+            }
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 module.exports = {
     createEvent,
     updateEvent,
     publishEvent,
     cancelEvent,
-    getPublishedEvents
+    getPublishedEvents,
+    getEventById
 };
