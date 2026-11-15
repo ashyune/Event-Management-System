@@ -157,11 +157,48 @@ const eventIdValidation = [
     validateRequest
 ];
 
+/**
+ * Validates event registration requests.
+ */
+const registrationInputValidation = [
+    body('eventId')
+        .notEmpty().withMessage('Event ID is required')
+        .isInt({ min: 1 }).withMessage('Event ID must be a positive integer')
+        .toInt(),
+
+    validateRequest
+];
+
+/**
+ * Validates registration IDs in route parameters.
+ */
+const registrationIdValidation = [
+    param('registrationId')
+        .isInt({ min: 1 }).withMessage('Registration ID must be a positive integer')
+        .toInt(),
+
+    validateRequest
+];
+
+/**
+ * Validates event IDs in registration status routes.
+ */
+const registrationEventIdValidation = [
+    param('eventId')
+        .isInt({ min: 1 }).withMessage('Event ID must be a positive integer')
+        .toInt(),
+
+    validateRequest
+];
+
 module.exports = {
     validateRequest,
     registerValidation,
     loginValidation,
     createEventValidation,
     updateEventValidation,
-    eventIdValidation
+    eventIdValidation,
+    registrationInputValidation,
+    registrationIdValidation,
+    registrationEventIdValidation
 };
