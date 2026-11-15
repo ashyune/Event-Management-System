@@ -1,22 +1,27 @@
 const express = require('express');
+
 const {
     createEventValidation,
     updateEventValidation,
     eventIdValidation
 } = require('../middleware/validationMiddleware');
+
 const {
     createEvent,
     updateEvent,
     publishEvent,
     cancelEvent,
-    getPublishedEvents
+    getPublishedEvents,
+    getEventById
 } = require('../controllers/eventController');
+
 const authenticate = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 
 router.get('/', getPublishedEvents);
+router.get('/:id', getEventById);
 
 router.post(
     '/',
@@ -49,4 +54,5 @@ router.patch(
     eventIdValidation,
     cancelEvent
 );
+
 module.exports = router;
