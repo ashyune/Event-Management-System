@@ -178,3 +178,38 @@ The following documents provide the project requirements, design, and testing sp
 ## Contributors
 
 Developed by Team 7 as part of the Software Engineering course at PES University.
+
+## Security Measures
+
+The backend implements the following security measures:
+
+- **Helmet:** Adds HTTP security headers to API responses.
+- **CORS restrictions:** Browser requests are restricted to the configured frontend origin.
+- **Login rate limiting:** Limits login attempts to 5 per IP address within 15 minutes. Successful login requests are not counted.
+- **Password protection:** Passwords are hashed using bcrypt before storage.
+- **JWT authentication:** Authenticated requests use signed JWTs with a configurable expiration.
+- **Role-based authorization:** Protected routes enforce the required user roles.
+- **Input validation:** Request inputs are validated and normalized before processing.
+- **Centralized error handling:** Internal error details are not exposed in server responses.
+
+### Environment Configuration
+
+Configure the following variables in the backend `.env` file:
+
+- `JWT_SECRET`: A long, randomly generated secret used to sign JWTs.
+- `JWT_EXPIRES_IN`: Token expiration duration (defaults to `1d`).
+- `CLIENT_URL`: Allowed frontend origin. Multiple origins can be comma-separated.
+
+Never commit `.env` or expose production secrets in source control.
+
+### HTTPS Deployment
+
+HTTPS must be enabled in production using the deployment platform or a TLS-enabled reverse proxy.
+
+- Use HTTPS for all production frontend-to-backend communication.
+- Configure `CLIENT_URL` with the deployed frontend's HTTPS origin.
+- Set `NODE_ENV=production`.
+- Use a strong, unique production JWT secret.
+- Do not transmit authentication credentials or JWTs over plain HTTP in production.
+
+Local development can continue using HTTP on localhost.
