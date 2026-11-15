@@ -1,5 +1,6 @@
+
 import { useEffect, useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getPublishedEvents } from "../services/eventservice";
 import { registerForEvent, getMyRegistrations } from "../services/registrationservice";
 
@@ -11,9 +12,19 @@ function Events() {
   const [registeredEventIds, setRegisteredEventIds] = useState(new Set());
   const [successModalData, setSuccessModalData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isLoggedIn = !!localStorage.getItem("token");
+
+  let currentUser = {};
+
+  try {
+    currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    currentUser = {};
+  }
 
   const loadData = useCallback(async () => {
     try {
@@ -24,27 +35,30 @@ function Events() {
       if (isLoggedIn) {
         try {
           const regData = await getMyRegistrations();
+
           if (Array.isArray(regData.registrations)) {
             const activeIds = new Set(
               regData.registrations
                 .filter((r) => r.status === "confirmed")
                 .map((r) => r.eventId)
             );
+
             setRegisteredEventIds(activeIds);
           }
-        } catch {
-          // Non-blocking if registrations fail to load
+        } catch (error) {
+          console.warn("Unable to load registration data:", error);
         }
       }
     } catch (error) {
       setMessage(error.response?.data?.message || "Unable to load events.");
+      setEvents([]);
     } finally {
       setLoading(false);
     }
   }, [isLoggedIn]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetch is intentional
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loadData handles asynchronous data loading
     void loadData();
   }, [loadData]);
 
@@ -67,16 +81,14 @@ function Events() {
 
       const res = await registerForEvent(eventItem.id);
 
-      // Add to registered list
       setRegisteredEventIds((prev) => new Set([...prev, eventItem.id]));
 
-      // Open ticket confirmation modal
       setSuccessModalData({
         eventTitle: eventItem.title,
         ticketCode: res.ticketCode,
         date: eventItem.date,
         time: eventItem.time,
-        venue: eventItem.venue,
+        venue: eventItem.venue
       });
     } catch (error) {
       alert(error.response?.data?.message || "Registration failed. Please try again.");
@@ -84,6 +96,11 @@ function Events() {
       setRegisteringId(null);
     }
   };
+
+  const canEditEvent = (event) =>
+    currentUser.role === "administrator" ||
+    (currentUser.role === "organizer" &&
+      String(currentUser.id) === String(event.organizerId));
 
   return (
     <main className="events-page">
@@ -105,8 +122,11 @@ function Events() {
         </button>
 
         <nav className={`events-nav ${menuOpen ? "events-nav--open" : ""}`}>
-          <Link to="/events" className="nav-active">Browse Events</Link>
+          <Link to="/events" className="nav-active">
+            Browse Events
+          </Link>
           <Link to="/events/create">Create Event</Link>
+
           {isLoggedIn ? (
             <>
               <Link to="/my-registrations">My Registrations</Link>
@@ -129,10 +149,12 @@ function Events() {
           Explore upcoming events, discover new interests, and connect with
           your community.
         </p>
+
         <div className="hero-actions">
           <Link className="primary-link" to="/events/create">
             Create an Event
           </Link>
+
           {isLoggedIn && (
             <Link className="secondary-link" to="/my-registrations">
               View My Bookings
@@ -147,14 +169,18 @@ function Events() {
             <p className="events-eyebrow">WHAT&apos;S HAPPENING</p>
             <h2>Upcoming Events</h2>
           </div>
-          <span>{events.length} {events.length === 1 ? "event" : "events"}</span>
+          <span>
+            {events.length} {events.length === 1 ? "event" : "events"}
+          </span>
         </div>
 
-        {loading && <p className="events-message">Loading events...</p>}
-
-        {!loading && message && (
-          <p className="events-message error-message">{message}</p>
+        {(message || location.state?.message) && (
+          <p className="events-message">
+            {message || location.state?.message}
+          </p>
         )}
+
+        {loading && <p className="events-message">Loading events...</p>}
 
         {!loading && !message && events.length === 0 && (
           <div className="events-empty">
@@ -166,7 +192,7 @@ function Events() {
           </div>
         )}
 
-        {!loading && !message && events.length > 0 && (
+        {!loading && events.length > 0 && (
           <div className="events-grid">
             {events.map((event) => {
               const isAlreadyRegistered = registeredEventIds.has(event.id);
@@ -221,6 +247,20 @@ function Events() {
                         {isProcessing ? "Booking Seat..." : "Register for Event"}
                       </button>
                     )}
+
+                    {canEditEvent(event) && (
+                      <button
+                        type="button"
+                        className="btn-register"
+                        onClick={() =>
+                          navigate(`/events/edit/${event.id}`, {
+                            state: { event }
+                          })
+                        }
+                      >
+                        Edit Event
+                      </button>
+                    )}
                   </div>
                 </article>
               );
@@ -229,12 +269,19 @@ function Events() {
         )}
       </section>
 
-      {/* Ticket Confirmation Modal */}
       {successModalData && (
-        <div className="modal-overlay" onClick={() => setSuccessModalData(null)}>
-          <div className="ticket-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-overlay"
+          onClick={() => setSuccessModalData(null)}
+        >
+          <div
+            className="ticket-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="ticket-modal-header">
-              <span className="modal-badge-success">🎉 Registration Confirmed!</span>
+              <span className="modal-badge-success">
+                🎉 Registration Confirmed!
+              </span>
               <button
                 type="button"
                 className="modal-close"
@@ -254,7 +301,9 @@ function Events() {
                 <span className="pass-label">OFFICIAL PASS REFERENCE</span>
                 <div className="pass-code-container">
                   <span className="pass-icon">🎟️</span>
-                  <strong className="pass-code">{successModalData.ticketCode}</strong>
+                  <strong className="pass-code">
+                    {successModalData.ticketCode}
+                  </strong>
                 </div>
               </div>
 
