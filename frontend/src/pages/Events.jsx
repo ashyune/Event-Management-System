@@ -1,6 +1,6 @@
 
 import { useEffect, useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getPublishedEvents } from "../services/eventservice";
 import { registerForEvent, getMyRegistrations } from "../services/registrationservice";
 
@@ -13,12 +13,21 @@ function Events() {
   const [successModalData, setSuccessModalData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [keyword, setKeyword] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("published");
-
-  const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
+
+  let currentUser = {};
+
+  try {
+    currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    currentUser = {};
+  }
 
   const loadData = useCallback(async () => {
     try {
@@ -57,11 +66,8 @@ function Events() {
   }, [isLoggedIn, keyword, date, status]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      void loadData();
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loadData handles asynchronous data loading
+    void loadData();
   }, [loadData]);
 
   const handleLogout = () => {
@@ -92,7 +98,7 @@ function Events() {
         ticketCode: res.ticketCode,
         date: eventItem.date,
         time: eventItem.time,
-        venue: eventItem.venue,
+        venue: eventItem.venue
       });
     } catch (error) {
       alert(
@@ -104,6 +110,10 @@ function Events() {
     }
   };
 
+  const canEditEvent = (event) =>
+    currentUser.role === "administrator" ||
+    (currentUser.role === "organizer" &&
+      String(currentUser.id) === String(event.organizerId));
   const clearFilters = () => {
     setKeyword("");
     setDate("");
@@ -175,7 +185,7 @@ function Events() {
       </section>
 
       <section className="events-content">
-        <div className="events-section-heading">
+               <div className="events-section-heading">
           <div>
             <p className="events-eyebrow">WHAT&apos;S HAPPENING</p>
             <h2>Upcoming Events</h2>
@@ -185,6 +195,12 @@ function Events() {
             {events.length} {events.length === 1 ? "event" : "events"}
           </span>
         </div>
+
+        {(message || location.state?.message) && (
+          <p className="events-message">
+            {message || location.state?.message}
+          </p>
+        )}
 
         <div className="event-search-filters">
           <input
@@ -200,10 +216,7 @@ function Events() {
             onChange={(e) => setDate(e.target.value)}
           />
 
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="published">Published</option>
           </select>
 
@@ -212,13 +225,7 @@ function Events() {
           </button>
         </div>
 
-        {loading && (
-          <p className="events-message">Loading events...</p>
-        )}
-
-        {!loading && message && (
-          <p className="events-message error-message">{message}</p>
-        )}
+        {loading && <p className="events-message">Loading events...</p>}
 
         {!loading && !message && events.length === 0 && (
           <div className="events-empty">
@@ -231,7 +238,7 @@ function Events() {
           </div>
         )}
 
-        {!loading && !message && events.length > 0 && (
+        {!loading && events.length > 0 && (
           <div className="events-grid">
             {events.map((event) => {
               const isAlreadyRegistered = registeredEventIds.has(event.id);
@@ -290,6 +297,20 @@ function Events() {
                         {isProcessing
                           ? "Booking Seat..."
                           : "Register for Event"}
+                      </button>
+                    )}
+
+                    {canEditEvent(event) && (
+                      <button
+                        type="button"
+                        className="btn-register"
+                        onClick={() =>
+                          navigate(`/events/edit/${event.id}`, {
+                            state: { event }
+                          })
+                        }
+                      >
+                        Edit Event
                       </button>
                     )}
                   </div>

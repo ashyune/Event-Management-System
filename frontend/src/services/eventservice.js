@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://localhost:5000/api"
 });
 
 export const getPublishedEvents = async (filters = {}) => {
@@ -17,8 +17,20 @@ export const createEvent = async (eventData) => {
 
   const response = await API.post("/events", eventData, {
     headers: {
-      Authorization: `Bearer ${token}`,
-    },
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data;
+};
+
+export const updateEvent = async (eventId, eventData) => {
+  const token = localStorage.getItem("token");
+
+  const response = await API.put(`/events/${eventId}`, eventData, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   });
 
   return response.data;
