@@ -1,10 +1,12 @@
 
 const express = require('express');
+
 const {
     createEventValidation,
     updateEventValidation,
     eventIdValidation
 } = require('../middleware/validationMiddleware');
+
 const {
     createEvent,
     updateEvent,

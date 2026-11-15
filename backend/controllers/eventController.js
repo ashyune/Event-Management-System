@@ -1,7 +1,7 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
 const Registration = require('../models/Registration');
-const createEvent = async (req, res) => {
+const createEvent = async (req, res, next) => {
     try {
         const { title, description, date, time, venue, capacity } = req.body;
 
@@ -76,8 +76,6 @@ const createEvent = async (req, res) => {
             event
         });
     } catch (error) {
-        console.error('Create event error:', error);
-
         if (
             error.name === 'SequelizeValidationError' ||
             error.name === 'SequelizeDatabaseError'
@@ -87,14 +85,11 @@ const createEvent = async (req, res) => {
             });
         }
 
-        return res.status(500).json({
-            message: 'Unable to create event'
-        });
+        return next(error);
     }
 };
 
-
-const updateEvent = async (req, res) => {
+const updateEvent = async (req, res, next) => {
     try {
         const event = await Event.findByPk(req.params.eventId);
 
@@ -240,8 +235,6 @@ const updateEvent = async (req, res) => {
             event
         });
     } catch (error) {
-        console.error('Update event error:', error);
-
         if (
             error.name === 'SequelizeValidationError' ||
             error.name === 'SequelizeDatabaseError'
@@ -251,12 +244,11 @@ const updateEvent = async (req, res) => {
             });
         }
 
-        return res.status(500).json({
-            message: 'Unable to update event'
-        });
+        return next(error);
     }
 };
-const updateEventStatus = async (req, res, newStatus) => {
+
+const updateEventStatus = async (req, res, next, newStatus) => {
     try {
         const event = await Event.findByPk(req.params.eventId);
 
@@ -295,22 +287,19 @@ const updateEventStatus = async (req, res, newStatus) => {
             event
         });
     } catch (error) {
-        console.error('Update event status error:', error);
-
-        return res.status(500).json({
-            message: 'Unable to update event status'
-        });
+        return next(error);
     }
 };
 
-const publishEvent = async (req, res) => {
-    return updateEventStatus(req, res, 'published');
+const publishEvent = async (req, res, next) => {
+    return updateEventStatus(req, res, next, 'published');
 };
 
-const cancelEvent = async (req, res) => {
-    return updateEventStatus(req, res, 'cancelled');
+const cancelEvent = async (req, res, next) => {
+    return updateEventStatus(req, res, next, 'cancelled');
 };
-const getPublishedEvents = async (req, res) => {
+
+const getPublishedEvents = async (req, res, next) => {
     try {
         const events = await Event.findAll({
             where: {
@@ -339,14 +328,11 @@ const getPublishedEvents = async (req, res) => {
             events
         });
     } catch (error) {
-        console.error('Get published events error:', error);
-
-        return res.status(500).json({
-            message: 'Unable to retrieve published events'
-        });
+        return next(error);
     }
 };
-const getEventById = async (req, res) => {
+
+const getEventById = async (req, res, next) => {
     try {
         const eventId = Number(req.params.id);
 
@@ -384,13 +370,10 @@ const getEventById = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Get event details error:', error);
-
-        return res.status(500).json({
-            message: 'Unable to retrieve event details'
-        });
+        return next(error);
     }
 };
+
 module.exports = {
     createEvent,
     updateEvent,
