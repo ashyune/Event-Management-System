@@ -5,8 +5,10 @@ const API = axios.create({
   baseURL: "http://localhost:5000/api"
 });
 
-export const getPublishedEvents = async () => {
-  const response = await API.get("/events");
+export const getPublishedEvents = async (filters = {}) => {
+  const response = await API.get("/events", {
+    params: filters
+  });
   return response.data;
 };
 
