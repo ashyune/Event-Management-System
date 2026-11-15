@@ -22,9 +22,6 @@ function Events() {
 
   const loadData = useCallback(async () => {
     try {
-      setLoading(true);
-      setMessage("");
-
       const data = await getPublishedEvents({
         keyword: keyword.trim(),
         date,
@@ -32,6 +29,7 @@ function Events() {
       });
 
       setEvents(Array.isArray(data.events) ? data.events : []);
+      setMessage("");
 
       if (isLoggedIn) {
         try {
@@ -46,8 +44,8 @@ function Events() {
 
             setRegisteredEventIds(activeIds);
           }
-        } catch {
-          // Registration data is optional for browsing events.
+        } catch (error) {
+          console.warn("Unable to load registration data:", error);
         }
       }
     } catch (error) {
@@ -59,7 +57,11 @@ function Events() {
   }, [isLoggedIn, keyword, date, status]);
 
   useEffect(() => {
-    void loadData();
+    const timeoutId = window.setTimeout(() => {
+      void loadData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [loadData]);
 
   const handleLogout = () => {
