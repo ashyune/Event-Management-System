@@ -1,7 +1,6 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
 const Registration = require('../models/Registration');
-
 const createEvent = async (req, res, next) => {
     try {
         const { title, description, date, time, venue, capacity } = req.body;
