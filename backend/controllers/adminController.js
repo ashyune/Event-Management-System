@@ -1,3 +1,4 @@
+
 const User = require('../models/User');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
@@ -6,7 +7,7 @@ const Registration = require('../models/Registration');
  * API 1: View all users
  * GET /api/admin/users
  */
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
     try {
         const users = await User.findAll({
             attributes: ['id', 'name', 'email', 'role', 'createdAt'],
@@ -18,28 +19,22 @@ const getAllUsers = async (req, res) => {
             users
         });
     } catch (error) {
-        console.error('Admin get all users error:', error);
-        return res.status(500).json({
-            message: 'Unable to retrieve users'
-        });
+        return next(error);
     }
 };
 
 /**
- * API 2: View all events (all statuses: draft, published, cancelled)
+ * API 2: View all events
  * GET /api/admin/events
- * Safely looks up organizer info without modifying model files or schemas
  */
-const getAllEvents = async (req, res) => {
+const getAllEvents = async (req, res, next) => {
     try {
         const events = await Event.findAll({
             order: [['createdAt', 'DESC']]
         });
 
-        // Collect unique organizer IDs from the retrieved events
         const organizerIds = [...new Set(events.map((e) => e.organizerId).filter(Boolean))];
 
-        // Fetch organizer details in a single safe query
         const organizers = await User.findAll({
             where: { id: organizerIds },
             attributes: ['id', 'name', 'email']
@@ -50,7 +45,6 @@ const getAllEvents = async (req, res) => {
             organizerMap.set(user.id, user);
         });
 
-        // Attach organizer details to each event object
         const eventsWithOrganizer = events.map((event) => {
             const plainEvent = event.toJSON();
             plainEvent.organizer = organizerMap.get(event.organizerId) || null;
@@ -62,10 +56,7 @@ const getAllEvents = async (req, res) => {
             events: eventsWithOrganizer
         });
     } catch (error) {
-        console.error('Admin get all events error:', error);
-        return res.status(500).json({
-            message: 'Unable to retrieve events'
-        });
+        return next(error);
     }
 };
 
@@ -73,7 +64,7 @@ const getAllEvents = async (req, res) => {
  * API 3: Delete user with safety and foreign-key checks
  * DELETE /api/admin/users/:userId
  */
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
         const targetUserId = Number(userId);
@@ -84,7 +75,6 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        // Prevent self-deletion by administrator
         if (Number(req.user.id) === targetUserId) {
             return res.status(400).json({
                 message: 'Administrators cannot delete their own account'
@@ -98,12 +88,10 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        // Safety check: verify if user owns events
         const organizedEventsCount = await Event.count({
             where: { organizerId: targetUserId }
         });
 
-        // Safety check: verify if user has active or past registrations
         const registrationsCount = await Registration.count({
             where: { userId: targetUserId }
         });
@@ -124,17 +112,13 @@ const deleteUser = async (req, res) => {
             message: 'User deleted successfully'
         });
     } catch (error) {
-        console.error('Admin delete user error:', error);
-
         if (error.name === 'SequelizeForeignKeyConstraintError') {
             return res.status(409).json({
                 message: 'Cannot delete user due to existing foreign key dependencies in the database'
             });
         }
 
-        return res.status(500).json({
-            message: 'Unable to delete user'
-        });
+        return next(error);
     }
 };
 
@@ -142,7 +126,7 @@ const deleteUser = async (req, res) => {
  * API 4: Cancel event with administrative override
  * DELETE /api/admin/events/:eventId
  */
-const cancelEvent = async (req, res) => {
+const cancelEvent = async (req, res, next) => {
     try {
         const { eventId } = req.params;
         const parsedEventId = Number(eventId);
@@ -167,7 +151,6 @@ const cancelEvent = async (req, res) => {
             });
         }
 
-        // Safely cancel event to preserve registration records
         event.status = 'cancelled';
         await event.save();
 
@@ -176,10 +159,7 @@ const cancelEvent = async (req, res) => {
             event
         });
     } catch (error) {
-        console.error('Admin cancel event error:', error);
-        return res.status(500).json({
-            message: 'Unable to cancel event'
-        });
+        return next(error);
     }
 };
 
@@ -189,4 +169,3 @@ module.exports = {
     deleteUser,
     cancelEvent
 };
-
