@@ -5,21 +5,21 @@ const {
     cancelRegistration,
     getEventRegistrationStatus
 } = require('../controllers/registrationController');
+
+const {
+    registrationInputValidation,
+    registrationIdValidation,
+    registrationEventIdValidation
+} = require('../middleware/validationMiddleware');
+
 const authenticate = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Register for an event (EMS-F-009, EMS-F-010, EMS-F-011)
-router.post('/', authenticate, registerForEvent);
-
-// View attendee's registered events (EMS-F-012)
+router.post('/', authenticate, registrationInputValidation, registerForEvent);
 router.get('/my-registrations', authenticate, getMyRegistrations);
-
-// Cancel a registration
-router.patch('/:registrationId/cancel', authenticate, cancelRegistration);
-
-// Check registration status and seat capacity for a specific event
-router.get('/event/:eventId/status', authenticate, getEventRegistrationStatus);
+router.patch('/:registrationId/cancel', authenticate, registrationIdValidation, cancelRegistration);
+router.get('/event/:eventId/status', authenticate, registrationEventIdValidation, getEventRegistrationStatus);
 
 module.exports = router;
 
