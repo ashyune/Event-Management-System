@@ -2,6 +2,7 @@ const express = require('express');
 const { getEventParticipants } = require('../controllers/organizerController');
 const authenticate = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/roleMiddleware');
+const { eventIdValidation } = require('../middleware/validationMiddleware');
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.get(
     '/:eventId/participants',
     authenticate,
     authorizeRoles('organizer', 'administrator'),
+    eventIdValidation,
     getEventParticipants
 );
 

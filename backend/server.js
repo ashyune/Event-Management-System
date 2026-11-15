@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 require("dotenv").config();
 
 const sequelize = require("./config/database");
@@ -13,12 +14,51 @@ const organizerRoutes = require("./routes/organizerRoutes");
 const authRoutes = require("./routes/authRoutes");
 const registrationRoutes = require("./routes/registrationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+
 const authenticate = require("./middleware/authMiddleware");
 const authorizeRoles = require("./middleware/roleMiddleware");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
-app.use(cors());
+// Configure allowed frontend origins.
+// CLIENT_URL can contain multiple comma-separated origins.
+const allowedOrigins = (
+  process.env.CLIENT_URL ||
+  (process.env.NODE_ENV === "production"
+    ? ""
+    : "http://localhost:5173")
+)
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+// Security headers.
+// HTTPS-upgrade behavior is enabled only in production.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        upgradeInsecureRequests:
+          process.env.NODE_ENV === "production" ? [] : null,
+      },
+    },
+  })
+);
+
+// Restrict browser access to configured frontend origins.
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+  })
+);
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -52,10 +92,15 @@ app.get(
   }
 );
 
+// Global 404 and error handling middleware.
+app.use(notFound);
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 
 if (require.main === module) {
-  sequelize.authenticate()
+  sequelize
+    .authenticate()
     .then(() => sequelize.sync())
     .then(() => {
       console.log("Database connected successfully");

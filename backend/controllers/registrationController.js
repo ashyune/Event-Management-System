@@ -1,3 +1,4 @@
+
 const crypto = require('crypto');
 const Registration = require('../models/Registration');
 const Event = require('../models/Event');
@@ -5,8 +6,7 @@ const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 
 /**
- * Generate a unique, verifiable ticket code
- * e.g. TKT-E1-U3-A8F2K9
+ * Generate a unique, verifiable ticket code.
  */
 const generateTicketCode = (eventId, userId) => {
     const randomHex = crypto.randomBytes(3).toString('hex').toUpperCase();
@@ -15,8 +15,8 @@ const generateTicketCode = (eventId, userId) => {
 };
 
 /**
- * Write a structured audit log entry — Issue #30
- * Failure is non-fatal: we log the error but never block the main response.
+ * Write a structured audit log entry.
+ * Failure is non-fatal: it never blocks the main response.
  */
 const writeAuditLog = async ({ userId, action, entityId, metadata = {} }) => {
     try {
@@ -28,16 +28,15 @@ const writeAuditLog = async ({ userId, action, entityId, metadata = {} }) => {
             metadata
         });
     } catch (auditErr) {
-        // Audit failure must never crash the main request
         console.error('[AuditLog] Failed to write audit entry:', auditErr.message);
     }
 };
 
 /**
- * Register for an event (EMS-F-009, EMS-F-010, EMS-F-011)
+ * Register for an event.
  * POST /api/registrations
  */
-const registerForEvent = async (req, res) => {
+const registerForEvent = async (req, res, next) => {
     try {
         const { eventId } = req.body;
 
@@ -54,7 +53,6 @@ const registerForEvent = async (req, res) => {
             });
         }
 
-        // 1. Check if event exists
         const event = await Event.findByPk(parsedEventId);
         if (!event) {
             return res.status(404).json({
@@ -62,14 +60,12 @@ const registerForEvent = async (req, res) => {
             });
         }
 
-        // 2. Ensure event is published
         if (event.status !== 'published') {
             return res.status(400).json({
                 message: 'Registrations are only open for published events'
             });
         }
 
-        // 3. Ensure event date is not in the past
         const [year, month, day] = event.date.split('-').map(Number);
         const eventDate = new Date(year, month - 1, day);
         const today = new Date();
@@ -81,7 +77,6 @@ const registerForEvent = async (req, res) => {
             });
         }
 
-        // 4. Duplicate Check (EMS-F-010): Check if user is already actively registered
         const existingActiveRegistration = await Registration.findOne({
             where: {
                 eventId: parsedEventId,
@@ -98,7 +93,6 @@ const registerForEvent = async (req, res) => {
             });
         }
 
-        // 5. Capacity Check (EMS-F-011): Ensure event capacity has not been exceeded
         const confirmedCount = await Registration.count({
             where: {
                 eventId: parsedEventId,
@@ -114,10 +108,8 @@ const registerForEvent = async (req, res) => {
             });
         }
 
-        // 6. Generate unique ticket code and create registration
         const ticketCode = generateTicketCode(parsedEventId, req.user.id);
 
-        // Check if there was a previously cancelled registration to re-activate
         const cancelledRegistration = await Registration.findOne({
             where: {
                 eventId: parsedEventId,
@@ -143,7 +135,6 @@ const registerForEvent = async (req, res) => {
             });
         }
 
-        // 7. Audit log — Issue #30
         await writeAuditLog({
             userId: req.user.id,
             action: 'REGISTRATION_CREATED',
@@ -155,7 +146,6 @@ const registerForEvent = async (req, res) => {
             }
         });
 
-        // Fetch populated event details
         const populatedRegistration = await Registration.findByPk(registration.id, {
             include: [
                 {
@@ -173,25 +163,21 @@ const registerForEvent = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Registration error:', error);
-
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(400).json({
                 message: 'You are already registered for this event'
             });
         }
 
-        return res.status(500).json({
-            message: 'Unable to process registration at this time'
-        });
+        return next(error);
     }
 };
 
 /**
- * Get all registrations for the logged-in user (EMS-F-012)
+ * Get all registrations for the logged-in user.
  * GET /api/registrations/my-registrations
  */
-const getMyRegistrations = async (req, res) => {
+const getMyRegistrations = async (req, res, next) => {
     try {
         const registrations = await Registration.findAll({
             where: {
@@ -214,18 +200,15 @@ const getMyRegistrations = async (req, res) => {
             registrations
         });
     } catch (error) {
-        console.error('Get my registrations error:', error);
-        return res.status(500).json({
-            message: 'Unable to fetch your registrations'
-        });
+        return next(error);
     }
 };
 
 /**
- * Cancel a registration
+ * Cancel a registration.
  * PATCH /api/registrations/:registrationId/cancel
  */
-const cancelRegistration = async (req, res) => {
+const cancelRegistration = async (req, res, next) => {
     try {
         const { registrationId } = req.params;
 
@@ -245,7 +228,6 @@ const cancelRegistration = async (req, res) => {
             });
         }
 
-        // Only the registered user or an administrator can cancel
         if (
             req.user.role !== 'administrator' &&
             Number(registration.userId) !== Number(req.user.id)
@@ -264,7 +246,6 @@ const cancelRegistration = async (req, res) => {
         registration.status = 'cancelled';
         await registration.save();
 
-        // Audit log — Issue #30
         await writeAuditLog({
             userId: req.user.id,
             action: 'REGISTRATION_CANCELLED',
@@ -281,18 +262,15 @@ const cancelRegistration = async (req, res) => {
             registration
         });
     } catch (error) {
-        console.error('Cancel registration error:', error);
-        return res.status(500).json({
-            message: 'Unable to cancel registration'
-        });
+        return next(error);
     }
 };
 
 /**
- * Get registration status & seat metrics for an event
+ * Get registration status and seat metrics for an event.
  * GET /api/registrations/event/:eventId/status
  */
-const getEventRegistrationStatus = async (req, res) => {
+const getEventRegistrationStatus = async (req, res, next) => {
     try {
         const { eventId } = req.params;
 
@@ -333,10 +311,7 @@ const getEventRegistrationStatus = async (req, res) => {
             ticketCode: userRegistration ? userRegistration.ticketCode : null
         });
     } catch (error) {
-        console.error('Get registration status error:', error);
-        return res.status(500).json({
-            message: 'Unable to check registration status'
-        });
+        return next(error);
     }
 };
 
