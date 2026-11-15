@@ -191,6 +191,28 @@ const registrationEventIdValidation = [
     validateRequest
 ];
 
+/**
+ * Validates user IDs in administrator routes.
+ */
+const userIdValidation = [
+    param('userId')
+        .isInt({ min: 1 }).withMessage('User ID must be a positive integer')
+        .toInt(),
+
+    validateRequest
+];
+
+/**
+ * Validates event IDs in administrator and organizer routes.
+ */
+const adminEventIdValidation = [
+    param('eventId')
+        .isInt({ min: 1 }).withMessage('Event ID must be a positive integer')
+        .toInt(),
+
+    validateRequest
+];
+
 module.exports = {
     validateRequest,
     registerValidation,
@@ -200,5 +222,7 @@ module.exports = {
     eventIdValidation,
     registrationInputValidation,
     registrationIdValidation,
-    registrationEventIdValidation
+    registrationEventIdValidation,
+    userIdValidation,
+    adminEventIdValidation
 };

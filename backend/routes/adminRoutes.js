@@ -5,6 +5,10 @@ const {
     deleteUser,
     cancelEvent
 } = require('../controllers/adminController');
+const {
+    userIdValidation,
+    eventIdValidation
+} = require('../middleware/validationMiddleware');
 const authenticate = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/roleMiddleware');
 
@@ -19,11 +23,7 @@ router.get('/users', getAllUsers);
 // API 2: View all events across all statuses
 router.get('/events', getAllEvents);
 
-// API 3: Delete user with safety check
-router.delete('/users/:userId', deleteUser);
-
-// API 4: Cancel event with administrator override
-router.delete('/events/:eventId', cancelEvent);
-
+router.delete('/users/:userId', userIdValidation, deleteUser);
+router.delete('/events/:eventId', eventIdValidation, cancelEvent);
 module.exports = router;
 
