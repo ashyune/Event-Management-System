@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -49,21 +49,17 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Registration error:", error);
-
     if (error.name === "SequelizeValidationError") {
       return res.status(400).json({
         message: "Invalid email format",
       });
     }
 
-    return res.status(500).json({
-      message: "Unable to register user",
-    });
+    return next(error);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -98,11 +94,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
-
-    return res.status(500).json({
-      message: "Unable to login",
-    });
+    return next(error);
   }
 };
 
