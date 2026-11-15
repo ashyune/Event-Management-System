@@ -8,6 +8,7 @@ import EditEvent from "./pages/EditEvent";
 import MyRegistrations from "./pages/MyRegistrations";
 import AdminDashboard from "./pages/AdminDashboard";
 import EventParticipants from "./pages/EventParticipants";
+import Reports from "./pages/Reports";
 import "./App.css";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/my-registrations" element={<MyRegistrations />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/events/:eventId/participants" element={<EventParticipants />} />
+        <Route path="/reports" element={<Reports />} />
       </Routes>
     </BrowserRouter>
   );
