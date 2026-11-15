@@ -1,7 +1,6 @@
-
 const { Op } = require('sequelize');
 const Event = require('../models/Event');
-
+const Registration = require('../models/Registration');
 const createEvent = async (req, res, next) => {
     try {
         const { title, description, date, time, venue, capacity } = req.body;
@@ -361,10 +360,53 @@ const getPublishedEvents = async (req, res, next) => {
     }
 };
 
+const getEventById = async (req, res, next) => {
+    try {
+        const eventId = Number(req.params.id);
+
+        if (!Number.isSafeInteger(eventId) || eventId < 1) {
+            return res.status(400).json({
+                message: 'Invalid event ID'
+            });
+        }
+
+        const event = await Event.findByPk(eventId);
+
+        if (!event || event.status !== 'published') {
+            return res.status(404).json({
+                message: 'Published event not found'
+            });
+        }
+
+        const confirmedCount = await Registration.count({
+            where: {
+                eventId: event.id,
+                status: 'confirmed'
+            }
+        });
+
+        const seatsAvailable = Math.max(
+            0,
+            event.capacity - confirmedCount
+        );
+
+        return res.status(200).json({
+            event: {
+                ...event.toJSON(),
+                confirmedRegistrations: confirmedCount,
+                seatsAvailable
+            }
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 module.exports = {
     createEvent,
     updateEvent,
     publishEvent,
     cancelEvent,
-    getPublishedEvents
+    getPublishedEvents,
+    getEventById
 };
