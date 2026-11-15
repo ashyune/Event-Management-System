@@ -1,6 +1,21 @@
 
 const Event = require('../models/Event');
-const User = require('../models/User');
+const AuditLog = require('../models/AuditLog');
+
+const writeAuditLog = async (userId, action, event, metadata = {}) => {
+    try {
+        await AuditLog.create({
+            userId,
+            action,
+            entityId: event.id,
+            entityType: 'event',
+            metadata
+        });
+    } catch (error) {
+        console.error('[AuditLog] Failed to write event audit entry:', error.message);
+        throw error;
+    }
+};
 
 const createEvent = async (req, res, next) => {
     try {
@@ -70,6 +85,11 @@ const createEvent = async (req, res, next) => {
             capacity: parsedCapacity,
             status: 'draft',
             organizerId: req.user.id
+        });
+
+        await writeAuditLog(req.user.id, 'EVENT_CREATED', event, {
+            title: event.title,
+            status: event.status
         });
 
         return res.status(201).json({
@@ -231,6 +251,10 @@ const updateEvent = async (req, res, next) => {
 
         await event.update(updates);
 
+        await writeAuditLog(req.user.id, 'EVENT_UPDATED', event, {
+            changedFields: Object.keys(updates)
+        });
+
         return res.status(200).json({
             message: 'Event updated successfully',
             event
@@ -282,6 +306,14 @@ const updateEventStatus = async (req, res, next, newStatus) => {
 
         event.status = newStatus;
         await event.save();
+
+        const action = newStatus === 'published'
+            ? 'EVENT_PUBLISHED'
+            : 'EVENT_CANCELLED';
+
+        await writeAuditLog(req.user.id, action, event, {
+            status: newStatus
+        });
 
         return res.status(200).json({
             message: `Event ${newStatus} successfully`,
