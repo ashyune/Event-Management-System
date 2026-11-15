@@ -1,5 +1,5 @@
+const { Op } = require('sequelize');
 const Event = require('../models/Event');
-const User = require('../models/User');
 const Registration = require('../models/Registration');
 const createEvent = async (req, res, next) => {
     try {
@@ -301,10 +301,38 @@ const cancelEvent = async (req, res, next) => {
 
 const getPublishedEvents = async (req, res, next) => {
     try {
+        const { keyword, date, status } = req.query;
+
+        const where = {
+            status: 'published'
+        };
+
+        if (keyword && keyword.trim()) {
+            where[Op.or] = [
+                { title: { [Op.iLike]: `%${keyword.trim()}%` } },
+                { description: { [Op.iLike]: `%${keyword.trim()}%` } },
+                { venue: { [Op.iLike]: `%${keyword.trim()}%` } }
+            ];
+        }
+
+        if (date) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(400).json({
+                    message: 'Date must use YYYY-MM-DD format'
+                });
+            }
+
+            where.date = date;
+        }
+
+        if (status && status !== 'published') {
+            return res.status(400).json({
+                message: 'Only published events are available in public event search'
+            });
+        }
+
         const events = await Event.findAll({
-            where: {
-                status: 'published'
-            },
+            where,
             attributes: [
                 'id',
                 'title',
