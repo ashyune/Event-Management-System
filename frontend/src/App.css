@@ -77,7 +77,7 @@ button {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
-.auth-card button {
+.auth-card button:not(.auth-toggle-password) {
   width: 100%;
   padding: 13px;
   margin-top: 24px;
@@ -1612,4 +1612,299 @@ textarea:focus-visible {
   .filter-pill.active {
     forced-color-adjust: none;
   }
+}
+
+
+/* ============================================================
+   FRONTEND UI POLISH & FORM STYLES
+   ============================================================ */
+
+/* ---- Auth form fixes ---- */
+.auth-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  text-align: left !important;
+}
+
+.auth-card h1 {
+  color: #0f172a !important;
+}
+
+.auth-card label {
+  color: #334155 !important;
+}
+
+.auth-card input {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.auth-password-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+.auth-password-wrapper input {
+  padding-right: 65px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.auth-toggle-password,
+.auth-card button.auth-toggle-password,
+.auth-password-wrapper button.auth-toggle-password {
+  position: absolute !important;
+  right: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: auto !important;
+  min-width: unset !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #6366f1 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+  z-index: 5 !important;
+}
+
+.auth-toggle-password:hover,
+.auth-card button.auth-toggle-password:hover,
+.auth-password-wrapper button.auth-toggle-password:hover {
+  background: transparent !important;
+  color: #3730a3 !important;
+}
+
+/* ---- Events Page Search & Filters Bar ---- */
+.event-search-filters {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  align-items: center !important;
+  margin: 0 0 28px !important;
+  padding: 16px 20px !important;
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(30, 41, 59, 0.04) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.event-search-filters input[type="text"] {
+  flex: 2 !important;
+  min-width: 220px !important;
+  padding: 11px 14px !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+.event-search-filters input[type="text"]:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+}
+
+.event-search-filters input[type="date"] {
+  flex: 1 !important;
+  min-width: 140px !important;
+  padding: 11px 14px !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+.event-search-filters select {
+  padding: 11px 14px !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  outline: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.event-search-filters button {
+  padding: 11px 18px !important;
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+
+.event-search-filters button:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.events-empty {
+  text-align: center !important;
+  padding: 48px 24px !important;
+  background: #ffffff !important;
+  border: 1px dashed #cbd5e1 !important;
+  border-radius: 16px !important;
+  margin-top: 16px !important;
+}
+
+.events-empty h3 {
+  margin: 0 0 8px !important;
+  font-size: 20px !important;
+  color: #0f172a !important;
+}
+
+.events-empty p {
+  margin: 0 0 16px !important;
+  color: #64748b !important;
+  font-size: 15px !important;
+}
+
+.events-empty button {
+  display: inline-block !important;
+  padding: 10px 20px !important;
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+}
+
+.events-empty button:hover {
+  background: #3730a3 !important;
+}
+
+/* ---- Create / Edit Event Forms ---- */
+.create-event-card {
+  padding: 36px !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 35px rgba(30, 41, 59, 0.08) !important;
+  text-align: left !important;
+}
+
+.create-event-card h1,
+.create-event-container h1 {
+  margin: 0 0 10px !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.create-event-intro,
+.create-event-container > p {
+  margin-bottom: 25px !important;
+  color: #64748b !important;
+  font-size: 15px !important;
+  text-align: left !important;
+}
+
+.create-event-card form,
+.create-event-container form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  text-align: left !important;
+}
+
+.create-event-card form label,
+.create-event-container form label {
+  display: block !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  font-size: 14px !important;
+  margin-bottom: 4px !important;
+  text-align: left !important;
+}
+
+.create-event-card form input,
+.create-event-card form textarea,
+.create-event-card form select,
+.create-event-container form input,
+.create-event-container form textarea,
+.create-event-container form select {
+  width: 100% !important;
+  padding: 12px 14px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #dbe1ec !important;
+  border-radius: 9px !important;
+  font-size: 14px !important;
+  box-sizing: border-box !important;
+  outline: none !important;
+  font-family: inherit !important;
+}
+
+.create-event-card form input:focus,
+.create-event-card form textarea:focus,
+.create-event-card form select:focus,
+.create-event-container form input:focus,
+.create-event-container form textarea:focus,
+.create-event-container form select:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+}
+
+.event-form-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+@media (max-width: 600px) {
+  .event-form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.submit-event-button,
+.create-event-card form button[type="submit"],
+.create-event-container form button[type="submit"] {
+  width: 100% !important;
+  padding: 14px !important;
+  margin-top: 16px !important;
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+}
+
+.submit-event-button:hover,
+.create-event-card form button[type="submit"]:hover,
+.create-event-container form button[type="submit"]:hover {
+  background: #3730a3 !important;
+}
+
+.submit-event-button:disabled,
+.create-event-card form button[type="submit"]:disabled,
+.create-event-container form button[type="submit"]:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
 }
