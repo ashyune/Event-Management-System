@@ -6,6 +6,7 @@ import Events from "./pages/Events";
 import CreateEvent from "./pages/CreateEvent";
 import EditEvent from "./pages/EditEvent";
 import MyRegistrations from "./pages/MyRegistrations";
+import AdminDashboard from "./pages/AdminDashboard";
 import "./App.css";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/events/create" element={<CreateEvent />} />
         <Route path="/events/edit/:eventId" element={<EditEvent />} />
         <Route path="/my-registrations" element={<MyRegistrations />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );
