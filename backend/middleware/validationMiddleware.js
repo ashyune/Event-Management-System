@@ -205,13 +205,6 @@ const userIdValidation = [
 /**
  * Validates event IDs in administrator and organizer routes.
  */
-const adminEventIdValidation = [
-    param('eventId')
-        .isInt({ min: 1 }).withMessage('Event ID must be a positive integer')
-        .toInt(),
-
-    validateRequest
-];
 
 module.exports = {
     validateRequest,
@@ -224,5 +217,4 @@ module.exports = {
     registrationIdValidation,
     registrationEventIdValidation,
     userIdValidation,
-    adminEventIdValidation
 };
