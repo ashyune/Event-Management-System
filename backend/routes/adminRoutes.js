@@ -3,7 +3,8 @@ const {
     getAllUsers,
     getAllEvents,
     deleteUser,
-    cancelEvent
+    cancelEvent,
+    getAuditLogs
 } = require('../controllers/adminController');
 const {
     userIdValidation,
@@ -23,7 +24,13 @@ router.get('/users', getAllUsers);
 // API 2: View all events across all statuses
 router.get('/events', getAllEvents);
 
+// API 3: Delete user with safety check and ID validation
 router.delete('/users/:userId', userIdValidation, deleteUser);
-router.delete('/events/:eventId', eventIdValidation, cancelEvent);
-module.exports = router;
 
+// API 4: Cancel event with administrator override and ID validation
+router.delete('/events/:eventId', eventIdValidation, cancelEvent);
+
+// API 5 (US-36): View audit logs with optional action filter
+router.get('/audit-logs', getAuditLogs);
+
+module.exports = router;
