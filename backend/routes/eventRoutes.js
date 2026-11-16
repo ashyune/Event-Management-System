@@ -13,7 +13,8 @@ const {
     publishEvent,
     cancelEvent,
     getPublishedEvents,
-    getEventById
+    getEventById,
+    getMyEvents
 } = require('../controllers/eventController');
 
 const authenticate = require('../middleware/authMiddleware');
@@ -22,6 +23,12 @@ const authorizeRoles = require('../middleware/roleMiddleware');
 const router = express.Router();
 
 router.get('/', getPublishedEvents);
+router.get(
+    '/mine',
+    authenticate,
+    authorizeRoles('organizer'),
+    getMyEvents
+);
 router.get('/:id', getEventById);
 
 router.post(

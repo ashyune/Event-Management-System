@@ -62,7 +62,7 @@ function CreateEvent() {
         capacity,
       });
 
-      navigate("/events");
+      navigate("/organizer");
     } catch (error) {
       setMessage(
         error.response?.data?.message ||
