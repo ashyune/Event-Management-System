@@ -1,4 +1,3 @@
-
 jest.mock("../models/Event", () => ({
   create: jest.fn(),
   findByPk: jest.fn(),
@@ -7,6 +6,10 @@ jest.mock("../models/Event", () => ({
 
 jest.mock("../models/AuditLog", () => ({
   create: jest.fn()
+}));
+
+jest.mock("../models/Registration", () => ({
+  count: jest.fn()
 }));
 
 const Event = require("../models/Event");

@@ -1,0 +1,385 @@
+npm notice run backend@1.0.0 test
+npm notice run jest --runInBand --runInBand
+PASS tests/auth.test.js (5.06 s)
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require("dotenv").config();
+        |                   ^
+      2 |
+      3 | const bcrypt = require("bcryptjs");
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (tests/auth.test.js:1:19)
+
+PASS tests/authModule.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require("dotenv").config();
+        |                   ^
+      2 |
+      3 | const bcrypt = require("bcryptjs");
+      4 | const jwt = require("jsonwebtoken");
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (tests/authModule.test.js:1:19)
+
+PASS tests/security.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+      2 | const cors = require("cors");
+      3 | const helmet = require("helmet");
+    > 4 | require("dotenv").config();
+        |                   ^
+      5 |
+      6 | const sequelize = require("./config/database");
+      7 | require("./models/User");
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (server.js:4:19)
+      at Object.require (tests/security.test.js:4:13)
+
+    console.error
+      ◇ injected env (0) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (server.js:6:19)
+      at Object.require (tests/security.test.js:4:13)
+
+PASS tests/eventAudit.test.js
+  ● Console
+
+    console.error
+      [AuditLog] Failed to write event audit entry: Audit database unavailable
+
+      14 |         });
+      15 |     } catch (error) {
+    > 16 |         console.error('[AuditLog] Failed to write event audit entry:', error.message);
+         |                 ^
+      17 |         throw error;
+      18 |     }
+      19 | };
+
+      at error (controllers/eventController.js:16:17)
+      at updateEventStatus (controllers/eventController.js:314:9)
+      at Object.<anonymous> (tests/eventAudit.test.js:248:7)
+
+PASS tests/admin.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/User.js:2:19)
+      at Object.require (controllers/adminController.js:2:14)
+      at Object.require (tests/admin.test.js:18:5)
+
+PASS tests/validation.test.js
+PASS tests/events.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/Event.js:3:19)
+      at Object.require (controllers/eventController.js:2:15)
+      at Object.require (tests/events.test.js:8:5)
+
+PASS tests/reports.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/User.js:2:19)
+      at Object.require (controllers/reportController.js:1:14)
+      at Object.require (tests/reports.test.js:13:46)
+
+PASS tests/registrations.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/Registration.js:2:19)
+      at Object.require (controllers/registrationController.js:3:22)
+      at Object.require (tests/registrations.test.js:18:98)
+
+PASS tests/eventDetails.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/Event.js:3:19)
+      at Object.require (controllers/eventController.js:2:15)
+      at Object.require (tests/eventDetails.test.js:2:26)
+
+PASS tests/errorMiddleware.test.js
+  ● Console
+
+    console.error
+      [404] GET /unknown: Error: Route not found: GET /unknown
+          at notFound (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/middleware/errorMiddleware.js:5:19)
+          at Layer.handleRequest (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/layer.js:152:17)
+          at trimPrefix (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:342:13)
+          at /home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:297:9
+          at processParams (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:582:12)
+          at next (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:291:5)
+          at router.handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:186:3)
+          at app.handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/express/lib/application.js:177:15)
+          at Server.app (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/express/lib/express.js:38:9)
+          at Server.emit (node:events:514:20)
+          at parserOnIncoming (node:_http_server:1464:12)
+          at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17) {
+        statusCode: 404
+      }
+
+      14 |     const statusCode = err.statusCode || err.status || 500;
+      15 |
+    > 16 |     console.error(`[${statusCode}] ${req.method} ${req.originalUrl}:`, err);
+         |             ^
+      17 |
+      18 |     res.status(statusCode).json({
+      19 |         success: false,
+
+      at error (middleware/errorMiddleware.js:16:13)
+      at Layer.handleError (node_modules/router/lib/layer.js:116:17)
+      at trimPrefix (node_modules/router/index.js:340:13)
+      at node_modules/router/index.js:297:9
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at next (middleware/errorMiddleware.js:7:5)
+      at Layer.handleRequest (node_modules/router/lib/layer.js:152:17)
+      at trimPrefix (node_modules/router/index.js:342:13)
+      at node_modules/router/index.js:297:9
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at router.handle (node_modules/router/index.js:186:3)
+      at app.handle (node_modules/express/lib/application.js:177:15)
+      at Server.app (node_modules/express/lib/express.js:38:9)
+
+    console.error
+      [400] GET /test-error: Error: Test error
+          at /home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/tests/errorMiddleware.test.js:13:19
+          at Layer.handleRequest (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/layer.js:152:17)
+          at next (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/route.js:157:13)
+          at Route.dispatch (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/route.js:117:3)
+          at handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:435:11)
+          at Layer.handleRequest (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/layer.js:152:17)
+          at /home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:295:15
+          at processParams (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:582:12)
+          at next (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:291:5)
+          at router.handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:186:3)
+          at app.handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/express/lib/application.js:177:15)
+          at Server.app (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/express/lib/express.js:38:9)
+          at Server.emit (node:events:514:20)
+          at parserOnIncoming (node:_http_server:1464:12)
+          at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17) {
+        statusCode: 400
+      }
+
+      14 |     const statusCode = err.statusCode || err.status || 500;
+      15 |
+    > 16 |     console.error(`[${statusCode}] ${req.method} ${req.originalUrl}:`, err);
+         |             ^
+      17 |
+      18 |     res.status(statusCode).json({
+      19 |         success: false,
+
+      at error (middleware/errorMiddleware.js:16:13)
+      at Layer.handleError (node_modules/router/lib/layer.js:116:17)
+      at trimPrefix (node_modules/router/index.js:340:13)
+      at node_modules/router/index.js:297:9
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at Layer.handleError (node_modules/router/lib/layer.js:111:12)
+      at trimPrefix (node_modules/router/index.js:340:13)
+      at node_modules/router/index.js:297:9
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at next (node_modules/router/lib/route.js:132:14)
+      at next (tests/errorMiddleware.test.js:15:5)
+      at Layer.handleRequest (node_modules/router/lib/layer.js:152:17)
+      at next (node_modules/router/lib/route.js:157:13)
+      at Route.dispatch (node_modules/router/lib/route.js:117:3)
+      at handle (node_modules/router/index.js:435:11)
+      at Layer.handleRequest (node_modules/router/lib/layer.js:152:17)
+      at node_modules/router/index.js:295:15
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at router.handle (node_modules/router/index.js:186:3)
+      at app.handle (node_modules/express/lib/application.js:177:15)
+      at Server.app (node_modules/express/lib/express.js:38:9)
+
+    console.error
+      [500] GET /test-500: Error: Database password or internal details
+          at /home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/tests/errorMiddleware.test.js:9:10
+          at Layer.handleRequest (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/layer.js:152:17)
+          at next (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/route.js:157:13)
+          at Route.dispatch (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/route.js:117:3)
+          at handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:435:11)
+          at Layer.handleRequest (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/lib/layer.js:152:17)
+          at /home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:295:15
+          at processParams (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:582:12)
+          at next (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:291:5)
+          at router.handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/router/index.js:186:3)
+          at app.handle (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/express/lib/application.js:177:15)
+          at Server.app (/home/ashyune/Desktop/Ash/5thSem_Labs/SE/Event-Management-System/backend/node_modules/express/lib/express.js:38:9)
+          at Server.emit (node:events:514:20)
+          at parserOnIncoming (node:_http_server:1464:12)
+          at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+
+      14 |     const statusCode = err.statusCode || err.status || 500;
+      15 |
+    > 16 |     console.error(`[${statusCode}] ${req.method} ${req.originalUrl}:`, err);
+         |             ^
+      17 |
+      18 |     res.status(statusCode).json({
+      19 |         success: false,
+
+      at error (middleware/errorMiddleware.js:16:13)
+      at Layer.handleError (node_modules/router/lib/layer.js:116:17)
+      at trimPrefix (node_modules/router/index.js:340:13)
+      at node_modules/router/index.js:297:9
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at Layer.handleError (node_modules/router/lib/layer.js:111:12)
+      at trimPrefix (node_modules/router/index.js:340:13)
+      at node_modules/router/index.js:297:9
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at next (node_modules/router/lib/route.js:132:14)
+      at next (tests/errorMiddleware.test.js:9:5)
+      at Layer.handleRequest (node_modules/router/lib/layer.js:152:17)
+      at next (node_modules/router/lib/route.js:157:13)
+      at Route.dispatch (node_modules/router/lib/route.js:117:3)
+      at handle (node_modules/router/index.js:435:11)
+      at Layer.handleRequest (node_modules/router/lib/layer.js:152:17)
+      at node_modules/router/index.js:295:15
+      at processParams (node_modules/router/index.js:582:12)
+      at next (node_modules/router/index.js:291:5)
+      at router.handle (node_modules/router/index.js:186:3)
+      at app.handle (node_modules/express/lib/application.js:177:15)
+      at Server.app (node_modules/express/lib/express.js:38:9)
+
+PASS tests/audit.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/User.js:2:19)
+      at Object.require (controllers/adminController.js:2:14)
+      at Object.require (tests/audit.test.js:17:5)
+
+PASS tests/organizer.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (models/Event.js:3:19)
+      at Object.require (controllers/organizerController.js:1:15)
+      at Object.require (tests/organizer.test.js:13:34)
+
+
+Test Suites: 13 passed, 13 total
+Tests:       95 passed, 95 total
+Snapshots:   0 total
+Time:        11.257 s
+Ran all test suites.

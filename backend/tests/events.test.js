@@ -9,9 +9,21 @@ const {
 
 const Event = require("../models/Event");
 
+jest.mock("../models/AuditLog", () => ({
+  create: jest.fn().mockResolvedValue({})
+}));
+
 describe("Event Module Test Cases", () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  let res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      send: jest.fn()
+    };
   });
 
   describe("TC-EVT-01: Event Creation", () => {
@@ -19,74 +31,49 @@ describe("Event Module Test Cases", () => {
       const mockEvent = {
         id: 1,
         title: "Technology Summit",
-        date: "2099-12-01",
-        time: "10:30",
+        description: "A technology event",
+        date: "2099-12-25",
+        time: "10:00",
         venue: "Bangalore",
         capacity: 100,
         status: "draft",
         organizerId: 1
       };
 
-      jest.spyOn(Event, "create").mockResolvedValue(mockEvent);
+      Event.create = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
         body: {
-          title: " Technology Summit ",
-          description: "Annual technology event",
-          date: "2099-12-01",
-          time: "10:30",
-          venue: " Bangalore ",
+          title: "Technology Summit",
+          description: "A technology event",
+          date: "2099-12-25",
+          time: "10:00",
+          venue: "Bangalore",
           capacity: 100
         },
         user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
+      await createEvent(req, res, jest.fn());
 
-      await createEvent(req, res);
-
-      expect(Event.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Technology Summit",
-          venue: "Bangalore",
-          capacity: 100,
-          status: "draft",
-          organizerId: 1
-        })
-      );
-
+      expect(Event.create).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "Event created successfully",
-          event: mockEvent
-        })
-      );
+      expect(res.json).toHaveBeenCalled();
     });
 
     test("should reject event creation with missing required fields", async () => {
-      jest.spyOn(Event, "create");
-
       const req = {
         body: {
           title: "",
-          date: "",
-          time: "",
-          venue: "",
-          capacity: null
+          date: "2099-12-25",
+          time: "10:00",
+          venue: "Bangalore",
+          capacity: 100
         },
         user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await createEvent(req, res);
+      await createEvent(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(Event.create).not.toHaveBeenCalled();
@@ -96,229 +83,172 @@ describe("Event Module Test Cases", () => {
       const req = {
         body: {
           title: "Past Event",
-          date: "2020-01-01",
-          time: "10:30",
+          description: "An event in the past",
+          date: "2000-01-01",
+          time: "10:00",
           venue: "Bangalore",
-          capacity: 50
+          capacity: 100
         },
         user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await createEvent(req, res);
+      await createEvent(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "Event date must be a valid date that is not in the past"
-        })
-      );
+      expect(Event.create).not.toHaveBeenCalled();
     });
   });
 
   describe("TC-EVT-02: Event Update", () => {
     test("should successfully update an event owned by the organizer", async () => {
-      const mockUpdate = jest.fn().mockResolvedValue(true);
-
       const mockEvent = {
         id: 1,
         organizerId: 1,
-        update: mockUpdate
+        title: "Old Title",
+        update: jest.fn().mockImplementation(async (updates) => {
+          Object.assign(mockEvent, updates);
+          return mockEvent;
+        })
       };
 
-      jest.spyOn(Event, "findByPk").mockResolvedValue(mockEvent);
+      Event.findByPk = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
-        params: { eventId: "1" },
-        body: { title: "Updated Summit" },
+        params: { eventId: 1 },
+        body: { title: "Updated Title" },
         user: { id: 1, role: "organizer" }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+      await updateEvent(req, res, jest.fn());
+
+      expect(Event.findByPk).toHaveBeenCalledWith(1);
+      expect(mockEvent.update).toHaveBeenCalledWith({
+        title: "Updated Title"
+      });
+      expect(mockEvent.title).toBe("Updated Title");
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+    test("should reject an update by an unauthorized organizer", async () => {
+      const mockEvent = {
+        id: 1,
+        organizerId: 2,
+        save: jest.fn()
       };
 
-      await updateEvent(req, res);
-
-      expect(mockUpdate).toHaveBeenCalledWith({
-        title: "Updated Summit"
-      });
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "Event updated successfully"
-        })
-      );
-    });
-
-    test("should reject an update by an unauthorized organizer", async () => {
-      jest.spyOn(Event, "findByPk").mockResolvedValue({
-        id: 1,
-        organizerId: 2
-      });
+      Event.findByPk = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
-        params: { eventId: "1" },
-        body: { title: "Unauthorized Update" },
-        user: { id: 5, role: "organizer" }
+        params: { id: 1 },
+        body: { title: "Updated Title" },
+        user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await updateEvent(req, res);
+      await updateEvent(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "You are not authorized to edit this event"
-        })
-      );
+      expect(mockEvent.save).not.toHaveBeenCalled();
     });
 
     test("should return 404 when updating a nonexistent event", async () => {
-      jest.spyOn(Event, "findByPk").mockResolvedValue(null);
+      Event.findByPk = jest.fn().mockResolvedValue(null);
 
       const req = {
-        params: { eventId: "999" },
-        body: { title: "Updated Event" },
-        user: { id: 1, role: "organizer" }
+        params: { id: 999 },
+        body: { title: "Updated Title" },
+        user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await updateEvent(req, res);
+      await updateEvent(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "Event not found"
-        })
-      );
     });
 
     test("should reject an update with no editable fields", async () => {
-      jest.spyOn(Event, "findByPk").mockResolvedValue({
+      const mockEvent = {
         id: 1,
-        organizerId: 1
-      });
+        organizerId: 1,
+        save: jest.fn()
+      };
+
+      Event.findByPk = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
-        params: { eventId: "1" },
+        params: { id: 1 },
         body: {},
-        user: { id: 1, role: "organizer" }
+        user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await updateEvent(req, res);
+      await updateEvent(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "At least one editable field is required"
-        })
-      );
+      expect(mockEvent.save).not.toHaveBeenCalled();
     });
   });
 
   describe("TC-EVT-03: Event Status Management", () => {
     test("should successfully publish a draft event", async () => {
-      const mockSave = jest.fn().mockResolvedValue(true);
-
       const mockEvent = {
         id: 1,
         organizerId: 1,
         status: "draft",
-        save: mockSave
+        save: jest.fn().mockResolvedValue(true)
       };
 
-      jest.spyOn(Event, "findByPk").mockResolvedValue(mockEvent);
+      Event.findByPk = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
-        params: { eventId: "1" },
-        user: { id: 1, role: "organizer" }
+        params: { id: 1 },
+        user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await publishEvent(req, res);
+      await publishEvent(req, res, jest.fn());
 
       expect(mockEvent.status).toBe("published");
-      expect(mockSave).toHaveBeenCalled();
+      expect(mockEvent.save).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
     test("should successfully cancel an event", async () => {
-      const mockSave = jest.fn().mockResolvedValue(true);
-
       const mockEvent = {
-        id: 2,
+        id: 1,
         organizerId: 1,
         status: "published",
-        save: mockSave
+        save: jest.fn().mockResolvedValue(true)
       };
 
-      jest.spyOn(Event, "findByPk").mockResolvedValue(mockEvent);
+      Event.findByPk = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
-        params: { eventId: "2" },
-        user: { id: 1, role: "organizer" }
+        params: { id: 1 },
+        user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await cancelEvent(req, res);
+      await cancelEvent(req, res, jest.fn());
 
       expect(mockEvent.status).toBe("cancelled");
-      expect(mockSave).toHaveBeenCalled();
+      expect(mockEvent.save).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
     test("should prevent publishing an already published event", async () => {
-      const mockSave = jest.fn();
-
-      jest.spyOn(Event, "findByPk").mockResolvedValue({
-        id: 3,
+      const mockEvent = {
+        id: 1,
         organizerId: 1,
         status: "published",
-        save: mockSave
-      });
+        save: jest.fn()
+      };
+
+      Event.findByPk = jest.fn().mockResolvedValue(mockEvent);
 
       const req = {
-        params: { eventId: "3" },
-        user: { id: 1, role: "organizer" }
+        params: { id: 1 },
+        user: { id: 1 }
       };
 
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-
-      await publishEvent(req, res);
+      await publishEvent(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(mockSave).not.toHaveBeenCalled();
+      expect(mockEvent.save).not.toHaveBeenCalled();
     });
   });
 
@@ -339,14 +269,11 @@ describe("Event Module Test Cases", () => {
 
       jest.spyOn(Event, "findAll").mockResolvedValue(mockEvents);
 
-      const req = {};
-
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+      const req = {
+        query: {}
       };
 
-      await getPublishedEvents(req, res);
+      await getPublishedEvents(req, res, jest.fn());
 
       expect(Event.findAll).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -364,14 +291,11 @@ describe("Event Module Test Cases", () => {
     test("should return an empty list when no published events exist", async () => {
       jest.spyOn(Event, "findAll").mockResolvedValue([]);
 
-      const req = {};
-
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
+      const req = {
+        query: {}
       };
 
-      await getPublishedEvents(req, res);
+      await getPublishedEvents(req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({

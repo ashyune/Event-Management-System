@@ -1,0 +1,79 @@
+npm notice run backend@1.0.0 npx
+npm notice run 'jest' tests/security.test.js tests/validation.test.js tests/auth.test.js tests/authModule.test.js --runInBand
+PASS tests/auth.test.js (5.244 s)
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require("dotenv").config();
+        |                   ^
+      2 |
+      3 | const bcrypt = require("bcryptjs");
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (tests/auth.test.js:1:19)
+
+PASS tests/authModule.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+    > 1 | require("dotenv").config();
+        |                   ^
+      2 |
+      3 | const bcrypt = require("bcryptjs");
+      4 | const jwt = require("jsonwebtoken");
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (tests/authModule.test.js:1:19)
+
+PASS tests/security.test.js
+  ● Console
+
+    console.error
+      ◇ injected env (9) from .env
+
+      2 | const cors = require("cors");
+      3 | const helmet = require("helmet");
+    > 4 | require("dotenv").config();
+        |                   ^
+      5 |
+      6 | const sequelize = require("./config/database");
+      7 | require("./models/User");
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (server.js:4:19)
+      at Object.require (tests/security.test.js:4:13)
+
+    console.error
+      ◇ injected env (0) from .env
+
+    > 1 | require('dotenv').config();
+        |                   ^
+      2 |
+      3 | const { Sequelize } = require('sequelize');
+      4 |
+
+      at ie (node_modules/dotenv/dist/index.cjs:7:155)
+      at Object.ae [as configDotenv] (node_modules/dotenv/dist/index.cjs:7:1128)
+      at Object.le [as config] (node_modules/dotenv/dist/index.cjs:7:1237)
+      at Object.config (config/database.js:1:19)
+      at Object.require (server.js:6:19)
+      at Object.require (tests/security.test.js:4:13)
+
+PASS tests/validation.test.js
+
+Test Suites: 4 passed, 4 total
+Tests:       32 passed, 32 total
+Snapshots:   0 total
+Time:        10.077 s
+Ran all test suites matching tests/security.test.js|tests/validation.test.js|tests/auth.test.js|tests/authModule.test.js.
