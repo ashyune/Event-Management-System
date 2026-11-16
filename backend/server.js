@@ -14,7 +14,7 @@ const organizerRoutes = require("./routes/organizerRoutes");
 const authRoutes = require("./routes/authRoutes");
 const registrationRoutes = require("./routes/registrationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
+const reportRoutes = require("./routes/reportRoutes");
 const authenticate = require("./middleware/authMiddleware");
 const authorizeRoles = require("./middleware/roleMiddleware");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -72,6 +72,7 @@ app.use("/api/events", organizerRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.get("/api/auth/me", authenticate, (req, res) => {
   res.json({
