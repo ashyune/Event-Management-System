@@ -143,7 +143,10 @@ function Events() {
           <Link to="/events" className="nav-active">
             Browse Events
           </Link>
-
+          {currentUser.role === "organizer" && (
+            <Link to="/organizer">My Events</Link>
+          )}
+        
           <Link to="/events/create">Create Event</Link>
 
           {isLoggedIn ? (

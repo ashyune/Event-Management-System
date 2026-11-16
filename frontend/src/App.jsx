@@ -7,6 +7,7 @@ import CreateEvent from "./pages/CreateEvent";
 import EditEvent from "./pages/EditEvent";
 import MyRegistrations from "./pages/MyRegistrations";
 import AdminDashboard from "./pages/AdminDashboard";
+import OrganizerDashboard from "./pages/OrganizerDashboard";
 import EventParticipants from "./pages/EventParticipants";
 import Reports from "./pages/Reports";
 import "./App.css";
@@ -25,6 +26,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/events/:eventId/participants" element={<EventParticipants />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/organizer" element={<OrganizerDashboard />} />
       </Routes>
     </BrowserRouter>
   );

@@ -435,11 +435,32 @@ const getEventById = async (req, res, next) => {
     }
 };
 
+const getMyEvents = async (req, res, next) => {
+    try {
+        const events = await Event.findAll({
+            where: {
+                organizerId: req.user.id
+            },
+            order: [
+                ['createdAt', 'DESC']
+            ]
+        });
+
+        return res.status(200).json({
+            count: events.length,
+            events
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 module.exports = {
     createEvent,
     updateEvent,
     publishEvent,
     cancelEvent,
     getPublishedEvents,
-    getEventById
+    getEventById,
+    getMyEvents
 };

@@ -35,3 +35,47 @@ export const updateEvent = async (eventId, eventData) => {
 
   return response.data;
 };
+
+export const getMyEvents = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await API.get("/events/mine", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data;
+};
+
+export const publishEvent = async (eventId) => {
+  const token = localStorage.getItem("token");
+
+  const response = await API.patch(
+    `/events/${eventId}/publish`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return response.data;
+};
+
+export const cancelEvent = async (eventId) => {
+  const token = localStorage.getItem("token");
+
+  const response = await API.patch(
+    `/events/${eventId}/cancel`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return response.data;
+};
