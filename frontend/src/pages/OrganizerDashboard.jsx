@@ -39,21 +39,20 @@ function OrganizerDashboard() {
   }, [navigate]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+   const token = localStorage.getItem("token");
 
-    let user = {};
-
+    const user = (() => {
     try {
-      user = JSON.parse(localStorage.getItem("user") || "{}");
+        return JSON.parse(localStorage.getItem("user") || "{}");
     } catch {
-      user = {};
+        return {};
     }
+    })();
 
     if (!token || user.role !== "organizer") {
-      navigate("/events");
-      return;
+    navigate("/events");
+    return;
     }
-
     // eslint-disable-next-line react-hooks/set-state-in-effect -- asynchronous data loading
     void loadEvents();
   }, [navigate, loadEvents]);
